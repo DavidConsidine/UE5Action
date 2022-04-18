@@ -23,10 +23,13 @@ protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void PrimaryAttack();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AActor> ProjectileClass;
 };
