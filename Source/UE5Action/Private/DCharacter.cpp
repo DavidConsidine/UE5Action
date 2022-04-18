@@ -59,6 +59,14 @@ void ADCharacter::PrimaryAttack()
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
+void ADCharacter::TryToJump()
+{
+	if (CanJump())
+	{
+		Jump();
+	}
+}
+
 void ADCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -91,5 +99,6 @@ void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ThisClass::PrimaryAttack);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::TryToJump);
 }
 
