@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UDInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class UE5ACTION_API ADCharacter : public ACharacter
@@ -24,13 +26,21 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void PrimaryInteract();
 	void TryToJump();
+	void PrimaryAttack_TimeElapsed();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<class AActor> ProjectileClass;
+	UPROPERTY(VisibleAnywhere)
+	UDInteractionComponent* InteractionComp;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
 };

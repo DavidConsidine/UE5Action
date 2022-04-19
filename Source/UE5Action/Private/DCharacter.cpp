@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "DInteractionComponent.h"
 
 ADCharacter::ADCharacter()
 {
@@ -17,6 +18,9 @@ ADCharacter::ADCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
+
+	InteractionComp = CreateDefaultSubobject<UDInteractionComponent>("InteractionComp");
+	
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -50,13 +54,17 @@ void ADCharacter::MoveRight(float Value)
 
 void ADCharacter::PrimaryAttack()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	PlayAnimMontage(AttackAnim);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ThisClass::PrimaryAttack_TimeElapsed, 0.2f);
+}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+void ADCharacter::PrimaryInteract()
+{
+	if (InteractionComp)
+	{
+		InteractionComp->PrimaryInteract();
+	}
 }
 
 void ADCharacter::TryToJump()
@@ -65,6 +73,17 @@ void ADCharacter::TryToJump()
 	{
 		Jump();
 	}
+}
+
+void ADCharacter::PrimaryAttack_TimeElapsed()
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
 void ADCharacter::Tick(float DeltaTime)
@@ -99,6 +118,8 @@ void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ThisClass::PrimaryAttack);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ThisClass::PrimaryInteract);
+
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::TryToJump);
 }
 
