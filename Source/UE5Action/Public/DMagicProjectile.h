@@ -21,6 +21,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void DestroyProjectile_TimeElapsed();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -29,4 +30,8 @@ protected:
 	UProjectileMovementComponent* MovementComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float MaxLifetime;
+
+	FTimerHandle TimerHandle_DestroyProjectile;
 };

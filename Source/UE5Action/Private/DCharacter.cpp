@@ -7,6 +7,9 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DInteractionComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/Widget.h"
 
 ADCharacter::ADCharacter()
 {
@@ -21,16 +24,16 @@ ADCharacter::ADCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UDInteractionComponent>("InteractionComp");
 	
-
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+
+	ProjectileTrace = 5000.f;
 }
 
 void ADCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ADCharacter::MoveForward(float Value)
@@ -82,16 +85,42 @@ void ADCharacter::PrimaryAttack_TimeElapsed()
 	//ensureAlways()
 	if (ensureAlways(ProjectileClass))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		APlayerController* MyController = Cast<APlayerController>(GetController());
+		if (MyController)
+		{
+			FVector2D ViewportSize;
+			FVector TraceStart;
+			FVector TraceDirection;
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
+			FHitResult Hit;
+			FName ProfileName;
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
+			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
 
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+			MyController->DeprojectScreenPositionToWorld((ViewportSize.X / 2.f), (ViewportSize.Y / 2.f), TraceStart, TraceDirection);
+
+			FVector TraceEnd = TraceStart + (TraceDirection * ProjectileTrace);
+			bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
+			FVector EndLocation = bBlockingHit ? Hit.ImpactPoint : TraceEnd;
+			
+			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
+			DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
+
+			FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+			FRotator HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, EndLocation);
+
+			FTransform SpawnTM = FTransform(HandRotation, HandLocation);
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnParams.Instigator = this;
+			GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+		}
 	}
 }
+
 
 void ADCharacter::Tick(float DeltaTime)
 {

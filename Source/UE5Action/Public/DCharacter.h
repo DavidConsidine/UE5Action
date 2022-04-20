@@ -10,6 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UDInteractionComponent;
 class UAnimMontage;
+class UUserWidget;
 
 UCLASS()
 class UE5ACTION_API ADCharacter : public ACharacter
@@ -41,6 +42,8 @@ protected:
 	UDInteractionComponent* InteractionComp;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float ProjectileTrace;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 };
