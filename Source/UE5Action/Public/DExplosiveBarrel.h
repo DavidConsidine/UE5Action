@@ -18,6 +18,7 @@ class UE5ACTION_API ADExplosiveBarrel : public AActor
 public:	
 	ADExplosiveBarrel();
 	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
 
 protected:
 	virtual void BeginPlay() override;
