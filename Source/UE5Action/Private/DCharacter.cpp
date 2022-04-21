@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Widget.h"
+#include "DBaseProjectile.h"
 
 ADCharacter::ADCharacter()
 {
@@ -62,6 +63,13 @@ void ADCharacter::PrimaryAttack()
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ThisClass::PrimaryAttack_TimeElapsed, 0.2f);
 }
 
+void ADCharacter::SecondaryAttack()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SecondaryAttack, this, &ThisClass::SecondaryAttack_TimeElapsed, 0.2f);
+}
+
 void ADCharacter::PrimaryInteract()
 {
 	if (InteractionComp)
@@ -83,41 +91,53 @@ void ADCharacter::PrimaryAttack_TimeElapsed()
 	//check()
 	//ensure()
 	//ensureAlways()
-	if (ensureAlways(ProjectileClass))
+	if (ensureAlways(PrimaryProjectileClass))
 	{
-		APlayerController* MyController = Cast<APlayerController>(GetController());
-		if (MyController)
-		{
-			FVector2D ViewportSize;
-			FVector TraceStart;
-			FVector TraceDirection;
+		FHitResult Hit;
+		LaunchProjectile(PrimaryProjectileClass, Hit);
+	}
+}
 
-			FHitResult Hit;
-			FName ProfileName;
-			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
-			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-			ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
+void ADCharacter::SecondaryAttack_TimeElapsed()
+{
+	if (ensureAlways(SecondaryProjectileClass))
+	{
+		FHitResult Hit;
+		LaunchProjectile(SecondaryProjectileClass, Hit);
+	}
+}
 
-			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
-			MyController->DeprojectScreenPositionToWorld((ViewportSize.X / 2.f), (ViewportSize.Y / 2.f), TraceStart, TraceDirection);
+void ADCharacter::LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit)
+{
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	if (MyController)
+	{
+		FVector2D ViewportSize;
+		FVector TraceStart;
+		FVector TraceDirection;
 
-			FVector TraceEnd = TraceStart + (TraceDirection * ProjectileTrace);
-			bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
-			FVector EndLocation = bBlockingHit ? Hit.ImpactPoint : TraceEnd;
-			
-			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
-			DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
 
-			FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-			FRotator HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, EndLocation);
+		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+		MyController->DeprojectScreenPositionToWorld((ViewportSize.X / 2.f), (ViewportSize.Y / 2.f), TraceStart, TraceDirection);
 
-			FTransform SpawnTM = FTransform(HandRotation, HandLocation);
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			SpawnParams.Instigator = this;
-			GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-		}
+		FVector TraceEnd = TraceStart + (TraceDirection * ProjectileTrace);
+		bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
+		FVector EndLocation = bBlockingHit ? Hit.ImpactPoint : TraceEnd;
+
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
+		DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FRotator HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, EndLocation);
+
+		FTransform SpawnTM = FTransform(HandRotation, HandLocation);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+		GetWorld()->SpawnActor<AActor>(Projectile, SpawnTM, SpawnParams);
 	}
 }
 
@@ -154,6 +174,7 @@ void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ThisClass::PrimaryAttack);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ThisClass::SecondaryAttack);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ThisClass::PrimaryInteract);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::TryToJump);

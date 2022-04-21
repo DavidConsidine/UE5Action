@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UDInteractionComponent;
 class UAnimMontage;
 class UUserWidget;
+class ADBaseProjectile;
 
 UCLASS()
 class UE5ACTION_API ADCharacter : public ACharacter
@@ -27,9 +28,14 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void SecondaryAttack();
 	void PrimaryInteract();
 	void TryToJump();
 	void PrimaryAttack_TimeElapsed();
+	void SecondaryAttack_TimeElapsed();
+
+private:
+	void LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -37,7 +43,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<class AActor> ProjectileClass;
+	TSubclassOf<class AActor> PrimaryProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<class AActor> SecondaryProjectileClass;
 	UPROPERTY(VisibleAnywhere)
 	UDInteractionComponent* InteractionComp;
 	UPROPERTY(EditAnywhere, Category = "Attack")
@@ -46,4 +54,5 @@ protected:
 	float ProjectileTrace;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_SecondaryAttack;
 };

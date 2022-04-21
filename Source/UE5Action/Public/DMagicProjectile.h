@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DBaseProjectile.h"
 #include "DMagicProjectile.generated.h"
 
 class USphereComponent;
@@ -11,7 +12,7 @@ class UProjectileMovementComponent;
 class UParticleSystemComponent;
 
 UCLASS()
-class UE5ACTION_API ADMagicProjectile : public AActor
+class UE5ACTION_API ADMagicProjectile : public ADBaseProjectile
 {
 	GENERATED_BODY()
 	
@@ -21,17 +22,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void DestroyProjectile_TimeElapsed();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USphereComponent* SphereComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UProjectileMovementComponent* MovementComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UParticleSystemComponent* EffectComp;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float MaxLifetime;
-
-	FTimerHandle TimerHandle_DestroyProjectile;
 };
