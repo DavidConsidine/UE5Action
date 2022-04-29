@@ -70,6 +70,13 @@ void ADCharacter::SecondaryAttack()
 	GetWorldTimerManager().SetTimer(TimerHandle_SecondaryAttack, this, &ThisClass::SecondaryAttack_TimeElapsed, 0.2f);
 }
 
+void ADCharacter::Teleport()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ThisClass::Teleport_TimeElapsed, 0.2f);
+}
+
 void ADCharacter::PrimaryInteract()
 {
 	if (InteractionComp)
@@ -104,6 +111,15 @@ void ADCharacter::SecondaryAttack_TimeElapsed()
 	{
 		FHitResult Hit;
 		LaunchProjectile(SecondaryProjectileClass, Hit);
+	}
+}
+
+void ADCharacter::Teleport_TimeElapsed()
+{
+	if (ensureAlways(TeleportProjectileClass))
+	{
+		FHitResult Hit;
+		LaunchProjectile(TeleportProjectileClass, Hit);
 	}
 }
 
@@ -176,6 +192,7 @@ void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ThisClass::PrimaryAttack);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ThisClass::SecondaryAttack);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ThisClass::PrimaryInteract);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ThisClass::Teleport);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::TryToJump);
 }

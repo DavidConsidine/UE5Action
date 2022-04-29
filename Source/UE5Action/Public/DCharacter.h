@@ -29,10 +29,12 @@ protected:
 	void MoveRight(float Value);
 	void PrimaryAttack();
 	void SecondaryAttack();
+	void Teleport();
 	void PrimaryInteract();
 	void TryToJump();
 	void PrimaryAttack_TimeElapsed();
 	void SecondaryAttack_TimeElapsed();
+	void Teleport_TimeElapsed();
 
 private:
 	void LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit);
@@ -46,6 +48,8 @@ protected:
 	TSubclassOf<class AActor> PrimaryProjectileClass;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<class AActor> SecondaryProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<class AActor> TeleportProjectileClass;
 	UPROPERTY(VisibleAnywhere)
 	UDInteractionComponent* InteractionComp;
 	UPROPERTY(EditAnywhere, Category = "Attack")
@@ -55,4 +59,5 @@ protected:
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_SecondaryAttack;
+	FTimerHandle TimerHandle_Teleport;
 };

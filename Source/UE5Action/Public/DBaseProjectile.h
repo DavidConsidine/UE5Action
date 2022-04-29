@@ -21,7 +21,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void DestroyProjectile_TimeElapsed();
+	virtual void DestroyProjectile_TimeElapsed();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
