@@ -23,12 +23,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UFUNCTION()
+
+	UFUNCTION(BlueprintNativeEvent)
 	void ComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void ComponentHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(EditAnywhere)
 	URadialForceComponent* ForceComp;

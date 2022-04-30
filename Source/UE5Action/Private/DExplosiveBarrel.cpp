@@ -41,7 +41,9 @@ void ADExplosiveBarrel::BeginPlay()
 	
 }
 
-void ADExplosiveBarrel::ComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+
+
+void ADExplosiveBarrel::ComponentHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
 
