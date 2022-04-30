@@ -11,6 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Widget.h"
 #include "DBaseProjectile.h"
+#include "DAttributeComponent.h"
 
 ADCharacter::ADCharacter()
 {
@@ -26,6 +27,8 @@ ADCharacter::ADCharacter()
 	InteractionComp = CreateDefaultSubobject<UDInteractionComponent>("InteractionComp");
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	AttrComp = CreateDefaultSubobject<UDAttributeComponent>(TEXT("AttrComp"));
 
 	bUseControllerRotationYaw = false;
 
@@ -144,8 +147,8 @@ void ADCharacter::LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& 
 		bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
 		FVector EndLocation = bBlockingHit ? Hit.ImpactPoint : TraceEnd;
 
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
-		DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
+		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
+		//DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 		FRotator HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, EndLocation);
 

@@ -18,7 +18,7 @@ ADTeleportProjectile::ADTeleportProjectile()
 void ADTeleportProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	//SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnActorHit);
 }
 
 void ADTeleportProjectile::Tick(float DeltaTime)
@@ -29,7 +29,6 @@ void ADTeleportProjectile::Tick(float DeltaTime)
 void ADTeleportProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
 }
 
 void ADTeleportProjectile::DestroyProjectile_TimeElapsed()
@@ -59,10 +58,10 @@ void ADTeleportProjectile::TeleportInstigator_TimeElapsed()
 	Destroy();
 }
 
-void ADTeleportProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ADTeleportProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	APawn* HitPawn = Cast<APawn>(OtherActor);
-	if (HitPawn != nullptr && HitPawn == GetInstigator())
+	APawn* OtherActorAsPawn = Cast<APawn>(OtherActor);
+	if (OtherActorAsPawn != nullptr && OtherActorAsPawn == GetInstigator())
 	{
 		return;
 	}

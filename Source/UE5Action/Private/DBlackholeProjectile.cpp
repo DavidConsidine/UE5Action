@@ -23,7 +23,7 @@ void ADBlackholeProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	SphereComp->SetCollisionProfileName("BlackholeProjectile");
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ADBlackholeProjectile::OnBeginOverlap);
+	//SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ADBlackholeProjectile::OnActorOverlap);
 }
 
 void ADBlackholeProjectile::Tick(float DeltaTime)
@@ -31,8 +31,13 @@ void ADBlackholeProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ADBlackholeProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ADBlackholeProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	APawn* OtherActorAsPawn = Cast<APawn>(OtherActor);
+	if (OtherActorAsPawn != nullptr && OtherActorAsPawn == GetInstigator())
+	{
+		return;
+	}
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, FString::Printf(TEXT("Overlap Actor: %s, Physics?: %d"), *OtherActor->GetName(), OverlappedComponent->IsSimulatingPhysics()));
 	OtherActor->Destroy();
 }

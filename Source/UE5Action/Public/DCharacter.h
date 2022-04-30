@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UDInteractionComponent;
+class UDAttributeComponent;
 class UAnimMontage;
 class UUserWidget;
 class ADBaseProjectile;
@@ -40,18 +41,23 @@ private:
 	void LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit);
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* CameraComp;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USpringArmComponent* SpringArmComp;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<class AActor> PrimaryProjectileClass;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<class AActor> SecondaryProjectileClass;
-	UPROPERTY(EditAnywhere, Category = "Attack")
+	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<class AActor> TeleportProjectileClass;
-	UPROPERTY(VisibleAnywhere)
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDInteractionComponent* InteractionComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDAttributeComponent* AttrComp;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 	UPROPERTY(EditAnywhere, Category = "Attack")
