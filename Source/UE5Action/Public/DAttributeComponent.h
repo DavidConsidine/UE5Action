@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "DAttributeComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UDAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UE5ACTION_API UDAttributeComponent : public UActorComponent
@@ -19,6 +20,9 @@ public:
 	bool ApplyHealthChange(float Delta);
 protected:
 	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthChanged OnHealthChanged;
 
 protected:
 	// Uproperty specifiers
