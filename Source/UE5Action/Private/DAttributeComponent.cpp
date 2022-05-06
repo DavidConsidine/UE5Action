@@ -18,3 +18,8 @@ bool UDAttributeComponent::ApplyHealthChange(float Delta)
 	return true;
 }
 
+bool UDAttributeComponent::IsAlive() const
+{
+	return Health > 0.f;
+}
+

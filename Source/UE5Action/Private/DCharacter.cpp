@@ -35,6 +35,12 @@ ADCharacter::ADCharacter()
 	ProjectileTrace = 5000.f;
 }
 
+void ADCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttrComp->OnHealthChanged.AddDynamic(this, &ADCharacter::OnHealthChanged);
+}
+
 void ADCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -120,6 +126,18 @@ void ADCharacter::Teleport_TimeElapsed()
 	if (ensureAlways(TeleportProjectileClass))
 	{
 		LaunchProjectile(TeleportProjectileClass);
+	}
+}
+
+void ADCharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta)
+{
+	if (NewHealth <= 0.f && Delta < 0.f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (PC != nullptr)
+		{
+			DisableInput(PC);
+		}
 	}
 }
 

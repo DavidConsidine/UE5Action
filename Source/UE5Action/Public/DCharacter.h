@@ -25,6 +25,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
 	void MoveRight(float Value);
@@ -36,6 +37,9 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 	void SecondaryAttack_TimeElapsed();
 	void Teleport_TimeElapsed();
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta);
 
 private:
 	void LaunchProjectile(TSubclassOf<AActor>& Projectile);
