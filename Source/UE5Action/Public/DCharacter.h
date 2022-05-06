@@ -38,7 +38,7 @@ protected:
 	void Teleport_TimeElapsed();
 
 private:
-	void LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit);
+	void LaunchProjectile(TSubclassOf<AActor>& Projectile);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")

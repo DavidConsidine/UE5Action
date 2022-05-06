@@ -103,8 +103,7 @@ void ADCharacter::PrimaryAttack_TimeElapsed()
 	//ensureAlways()
 	if (ensureAlways(PrimaryProjectileClass))
 	{
-		FHitResult Hit;
-		LaunchProjectile(PrimaryProjectileClass, Hit);
+		LaunchProjectile(PrimaryProjectileClass);
 	}
 }
 
@@ -112,8 +111,7 @@ void ADCharacter::SecondaryAttack_TimeElapsed()
 {
 	if (ensureAlways(SecondaryProjectileClass))
 	{
-		FHitResult Hit;
-		LaunchProjectile(SecondaryProjectileClass, Hit);
+		LaunchProjectile(SecondaryProjectileClass);
 	}
 }
 
@@ -121,41 +119,49 @@ void ADCharacter::Teleport_TimeElapsed()
 {
 	if (ensureAlways(TeleportProjectileClass))
 	{
-		FHitResult Hit;
-		LaunchProjectile(TeleportProjectileClass, Hit);
+		LaunchProjectile(TeleportProjectileClass);
 	}
 }
 
-void ADCharacter::LaunchProjectile(TSubclassOf<AActor>& Projectile, FHitResult& Hit)
+void ADCharacter::LaunchProjectile(TSubclassOf<AActor>& Projectile)
 {
-	APlayerController* MyController = Cast<APlayerController>(GetController());
-	if (MyController)
+	if (ensure(Projectile))
 	{
-		FVector2D ViewportSize;
-		FVector TraceStart;
-		FVector TraceDirection;
-
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
-
-		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
-		MyController->DeprojectScreenPositionToWorld((ViewportSize.X / 2.f), (ViewportSize.Y / 2.f), TraceStart, TraceDirection);
-
-		FVector TraceEnd = TraceStart + (TraceDirection * ProjectileTrace);
-		bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
-		FVector EndLocation = bBlockingHit ? Hit.ImpactPoint : TraceEnd;
-
-		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.f, 0, 1.f);
-		//DrawDebugLine(GetWorld(), TraceStart, EndLocation, FColor::Blue, false, 10.f, 0, 1.f);
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FRotator HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, EndLocation);
 
-		FTransform SpawnTM = FTransform(HandRotation, HandLocation);
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = this;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.f);
+
+		// Ignore the player
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		// endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+		
+		FHitResult Hit;
+		// returns true if we got to a blocking hit
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
+		{
+			// Overwrite trace end with impact point in world
+			TraceEnd = Hit.ImpactPoint;
+		}
+
+		// find new direction/rotation from Hand pointing to impact point in world.
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
 		GetWorld()->SpawnActor<AActor>(Projectile, SpawnTM, SpawnParams);
 	}
 }
