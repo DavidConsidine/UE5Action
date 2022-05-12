@@ -6,21 +6,23 @@
 #include "GameFramework/Character.h"
 #include "DAICharacter.generated.h"
 
+class UPawnSensingComponent;
+
 UCLASS()
 class UE5ACTION_API ADAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ADAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
 
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
 };
