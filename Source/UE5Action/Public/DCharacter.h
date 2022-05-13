@@ -13,6 +13,7 @@ class UDAttributeComponent;
 class UAnimMontage;
 class UUserWidget;
 class ADBaseProjectile;
+class UParticleSystem;
 
 UCLASS()
 class UE5ACTION_API ADCharacter : public ACharacter
@@ -31,6 +32,7 @@ protected:
 	void MoveRight(float Value);
 	void PrimaryAttack();
 	void SecondaryAttack();
+	void StartAttackEffects();
 	void Teleport();
 	void PrimaryInteract();
 	void TryToJump();
@@ -66,6 +68,15 @@ protected:
 	UAnimMontage* AttackAnim;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float ProjectileTrace;
+
+	UPROPERTY(VisibleAnywhere, Category="Effects")
+	FName HandSocketName;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* CastingEffect;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_SecondaryAttack;

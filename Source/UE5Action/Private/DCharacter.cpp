@@ -12,6 +12,7 @@
 #include "Components/Widget.h"
 #include "DBaseProjectile.h"
 #include "DAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ADCharacter::ADCharacter()
 {
@@ -33,6 +34,9 @@ ADCharacter::ADCharacter()
 	bUseControllerRotationYaw = false;
 
 	ProjectileTrace = 5000.f;
+
+	TimeToHitParamName = "TimeToHit";
+	HandSocketName = "Muzzle_01";
 }
 
 void ADCharacter::PostInitializeComponents()
@@ -67,21 +71,27 @@ void ADCharacter::MoveRight(float Value)
 
 void ADCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 	
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ThisClass::PrimaryAttack_TimeElapsed, 0.2f);
 }
 
 void ADCharacter::SecondaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SecondaryAttack, this, &ThisClass::SecondaryAttack_TimeElapsed, 0.2f);
 }
 
-void ADCharacter::Teleport()
+void ADCharacter::StartAttackEffects()
 {
 	PlayAnimMontage(AttackAnim);
+	UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+}
+
+void ADCharacter::Teleport()
+{
+	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ThisClass::Teleport_TimeElapsed, 0.2f);
 }
@@ -131,6 +141,11 @@ void ADCharacter::Teleport_TimeElapsed()
 
 void ADCharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+	}
+
 	if (NewHealth <= 0.f && Delta < 0.f)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
@@ -145,7 +160,7 @@ void ADCharacter::LaunchProjectile(TSubclassOf<AActor>& Projectile)
 {
 	if (ensure(Projectile))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
