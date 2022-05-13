@@ -6,6 +6,9 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
+#include "Camera/CameraShakeBase.h"
 
 
 ADProjectileBaseAlt::ADProjectileBaseAlt()
@@ -19,11 +22,17 @@ ADProjectileBaseAlt::ADProjectileBaseAlt()
 	FXComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FXComp"));
 	FXComp->SetupAttachment(RootComponent);
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
+	AudioComp->SetupAttachment(RootComponent);
+
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MoveComp"));
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->bInitialVelocityInLocalSpace = true;
 	MoveComp->ProjectileGravityScale = 0.0f;
 	MoveComp->InitialSpeed = 8000.f;
+
+	ImpactShakeInnerRadius = 250.f;
+	ImpactShakeOuterRadius = 2500.f;
 }
 
 void ADProjectileBaseAlt::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -39,6 +48,11 @@ void ADProjectileBaseAlt::Explode_Implementation()
 	if (ensure(!IsPendingKill()) && ImpactFX != nullptr)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactFX, GetActorLocation(), GetActorRotation());
+		
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+
+		UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
+		
 		Destroy();
 	}
 }

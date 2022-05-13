@@ -9,6 +9,9 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
+class UAudioComponent;
+class USoundCue;
+class UCameraShakeBase;
 
 // 'ABSTRACT' marks this class as incomplete,
 // keeping this out of certain dropdown windows like SpawnActor in Unreal Editor
@@ -21,8 +24,20 @@ public:
 	ADProjectileBaseAlt();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category="FX|Shake")
+	TSubclassOf<UCameraShakeBase> ImpactShake;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX|Shake")
+	float ImpactShakeInnerRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX|Shake")
+	float ImpactShakeOuterRadius;
+
 	UPROPERTY(EditDefaultsOnly, Category="FX")
 	UParticleSystem* ImpactFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	USoundCue* ImpactSound;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USphereComponent* SphereComp;
@@ -32,6 +47,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UParticleSystemComponent* FXComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UAudioComponent* AudioComp;
 
 protected:
 	UFUNCTION()
