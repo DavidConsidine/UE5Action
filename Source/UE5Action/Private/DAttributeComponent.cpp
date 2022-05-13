@@ -5,21 +5,36 @@
 
 UDAttributeComponent::UDAttributeComponent()
 {
-	Health = 100.f;
+	HealthMax = 100.f;
+	Health = HealthMax;
 }
 
 
 bool UDAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	float OldHealth = Health;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	Health = FMath::Clamp(Health + Delta, 0.f, HealthMax);
 
-	return true;
+	float ActualDelta = Health - OldHealth;
+
+	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta); // @fixme: Still nullptr for Instigator parameter
+
+	return ActualDelta != 0;
 }
 
 bool UDAttributeComponent::IsAlive() const
 {
 	return Health > 0.f;
+}
+
+bool UDAttributeComponent::IsFullHealth() const
+{
+	return Health == HealthMax;
+}
+
+float UDAttributeComponent::GetHealthMax() const
+{
+	return HealthMax;
 }
 
