@@ -7,6 +7,7 @@
 #include "AI/DAICharacter.h"
 #include "DAttributeComponent.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 
 ADGameModeBase::ADGameModeBase()
 {
@@ -24,6 +25,32 @@ void ADGameModeBase::StartPlay()
 
 void ADGameModeBase::SpawnBotTimerElapsed()
 {
+	int32 NrOfAliveBots = 0;
+	for (TActorIterator<ADAICharacter> It(GetWorld()); It; ++It)
+	{
+		ADAICharacter* Bot = *It;
+
+		UDAttributeComponent* AttrComp = Cast<UDAttributeComponent>(Bot->GetComponentByClass(UDAttributeComponent::StaticClass()));
+		if (ensure(AttrComp) && AttrComp->IsAlive())
+		{
+			NrOfAliveBots++;
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Found %i alive bots."), NrOfAliveBots);
+
+	float MaxBotCount = 10.f;
+	if (DifficultyCurve)
+	{
+		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
+	}
+
+	if (NrOfAliveBots >= MaxBotCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("At maximum bot capacity. Skipping bot spawn"));
+		return;
+	}
+
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 	if (ensure(QueryInstance))
 	{
@@ -40,35 +67,12 @@ void ADGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 		return;
 	}
 
-	int32 NrOfAliveBots = 0;
-	for (TActorIterator<ADAICharacter> It(GetWorld()); It; ++It)
-	{
-		ADAICharacter* Bot = *It;
-
-		UDAttributeComponent* AttrComp = Cast<UDAttributeComponent>(Bot->GetComponentByClass(UDAttributeComponent::StaticClass()));
-		if (AttrComp && AttrComp->IsAlive())
-		{
-			NrOfAliveBots++;
-		}
-	}
-
-	float MaxBotCount = 10.f;
-	if(DifficultyCurve)
-	{ 
-		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
-	}
-
-	if (NrOfAliveBots >= MaxBotCount)
-	{
-		return;
-	}
-
-
-
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 
 	if (Locations.IsValidIndex(0))
 	{
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+
+		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 60.f);
 	}
 }

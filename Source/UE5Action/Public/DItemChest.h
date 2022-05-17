@@ -16,7 +16,6 @@ class UE5ACTION_API ADItemChest : public AActor, public IDGameplayInterface
 	
 public:	
 	ADItemChest();
-	virtual void Tick(float DeltaTime) override;
 
 	void Interact_Implementation(APawn* InstigatorPawn);
 
@@ -24,7 +23,6 @@ public:
 	float TargetPitch;
 
 protected:
-	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

@@ -7,7 +7,6 @@
 // Sets default values
 ADItemChest::ADItemChest()
 {
-	PrimaryActorTick.bCanEverTick = true;
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
 	RootComponent = BaseMesh;
@@ -18,19 +17,7 @@ ADItemChest::ADItemChest()
 	TargetPitch = 110.f;
 }
 
-void ADItemChest::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ADItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
 	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0.f, 0.f));
-}
-
-void ADItemChest::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }

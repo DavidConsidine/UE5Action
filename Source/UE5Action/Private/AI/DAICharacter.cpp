@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 #include "DAttributeComponent.h"
+#include "BrainComponent.h"
 
 ADAICharacter::ADAICharacter()
 {
@@ -42,7 +43,19 @@ void ADAICharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponen
 {
     if (Delta < 0.f)
     {
-        //GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+        if (NewHealth <= 0.f)
+        {
+            AAIController* AIC = Cast<AAIController>(GetController());
+            if (AIC != nullptr)
+            {
+                AIC->GetBrainComponent()->StopLogic("Killed");
+            }
+
+            GetMesh()->SetAllBodiesSimulatePhysics(true);
+            GetMesh()->SetCollisionProfileName("Ragdoll");
+
+            SetLifeSpan(10.f);
+        }
     }
 
     if (NewHealth <= 0.f && Delta < 0.f)
