@@ -7,6 +7,7 @@
 #include "DAICharacter.generated.h"
 
 class UPawnSensingComponent;
+class UDAttributeComponent;
 
 UCLASS()
 class UE5ACTION_API ADAICharacter : public ACharacter
@@ -22,7 +23,13 @@ protected:
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta);
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UDAttributeComponent* AttrComp;
 };
