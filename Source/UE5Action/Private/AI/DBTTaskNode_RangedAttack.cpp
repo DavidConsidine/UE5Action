@@ -5,6 +5,12 @@
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "DAttributeComponent.h"
+
+UDBTTaskNode_RangedAttack::UDBTTaskNode_RangedAttack()
+{
+	MaxProjectileSpread = 2.f;
+}
 
 EBTNodeResult::Type UDBTTaskNode_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -25,8 +31,16 @@ EBTNodeResult::Type UDBTTaskNode_RangedAttack::ExecuteTask(UBehaviorTreeComponen
 			return EBTNodeResult::Failed;
 		}
 
+		if (!UDAttributeComponent::IsActorAlive(TargetActor))
+		{
+			return EBTNodeResult::Failed;
+		}
+
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		FRotator MuzzleRotation = Direction.Rotation();
+
+		MuzzleRotation.Pitch += FMath::RandRange(0.f, MaxProjectileSpread);
+		MuzzleRotation.Yaw += FMath::RandRange(-MaxProjectileSpread, MaxProjectileSpread);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Instigator = MyPawn;
