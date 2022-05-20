@@ -34,4 +34,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDAttributeComponent* AttrComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
 };

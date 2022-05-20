@@ -16,6 +16,8 @@ ADAICharacter::ADAICharacter()
     AttrComp = CreateDefaultSubobject<UDAttributeComponent>(TEXT("AttrComp"));
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+    TimeToHitParamName = "TimeToHit";
 }
 
 void ADAICharacter::PostInitializeComponents()
@@ -41,6 +43,8 @@ void ADAICharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponen
         {
             SetTargetActor(InstigatorActor);
         }
+
+        GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 
         if (NewHealth <= 0.f)
         {
