@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "DAttributeComponent.h"
 #include "BrainComponent.h"
+#include "DWorldUserWidget.h"
 
 ADAICharacter::ADAICharacter()
 {
@@ -42,6 +43,16 @@ void ADAICharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponen
         if (InstigatorActor != this)
         {
             SetTargetActor(InstigatorActor);
+        }
+
+        if (ActiveHealthBar == nullptr)
+        {
+            ActiveHealthBar = CreateWidget<UDWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+            if (ActiveHealthBar)
+            {
+                ActiveHealthBar->AttachedActor = this;
+                ActiveHealthBar->AddToViewport();
+            }
         }
 
         GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);

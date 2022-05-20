@@ -8,6 +8,8 @@
 
 class UPawnSensingComponent;
 class UDAttributeComponent;
+class UUserWidget;
+class UDWorldUserWidget;
 
 UCLASS()
 class UE5ACTION_API ADAICharacter : public ACharacter
@@ -37,4 +39,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UDWorldUserWidget* ActiveHealthBar;
 };
