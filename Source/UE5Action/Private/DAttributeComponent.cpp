@@ -3,12 +3,32 @@
 
 #include "DAttributeComponent.h"
 
+
+
 UDAttributeComponent::UDAttributeComponent()
 {
 	HealthMax = 100.f;
 	Health = HealthMax;
 }
 
+UDAttributeComponent* UDAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return Cast<UDAttributeComponent>(FromActor->GetComponentByClass(UDAttributeComponent::StaticClass()));
+	}
+	return nullptr;
+}
+
+bool UDAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UDAttributeComponent* AttrComp = GetAttributes(Actor);
+	if (AttrComp)
+	{
+		return AttrComp->IsAlive();
+	}
+	return false;
+}
 
 bool UDAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {

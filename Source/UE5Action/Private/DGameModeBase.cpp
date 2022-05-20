@@ -30,7 +30,7 @@ void ADGameModeBase::SpawnBotTimerElapsed()
 	{
 		ADAICharacter* Bot = *It;
 
-		UDAttributeComponent* AttrComp = Cast<UDAttributeComponent>(Bot->GetComponentByClass(UDAttributeComponent::StaticClass()));
+		UDAttributeComponent* AttrComp = UDAttributeComponent::GetAttributes(Bot);
 		if (ensure(AttrComp) && AttrComp->IsAlive())
 		{
 			NrOfAliveBots++;
