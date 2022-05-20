@@ -43,7 +43,7 @@ void ADMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		UDAttributeComponent* AttrComp = Cast<UDAttributeComponent>(OtherActor->GetComponentByClass(UDAttributeComponent::StaticClass()));
 		if (AttrComp)
 		{
-			AttrComp->ApplyHealthChange(-20.f);
+			AttrComp->ApplyHealthChange(GetInstigator(), -20.f);
 		}
 	
 		if (ImpactParticleSystem != nullptr)

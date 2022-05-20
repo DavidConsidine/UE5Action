@@ -29,20 +29,19 @@ void ADAICharacter::PostInitializeComponents()
 
 void ADAICharacter::OnPawnSeen(APawn* Pawn)
 {
-    AAIController* AIC = Cast<AAIController>(GetController());
-    if (AIC)
-    {
-        UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
-        BBComp->SetValueAsObject("TargetActor", Pawn);
-
-        DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
-    }
+    SetTargetActor(Pawn);
+    DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
 }
 
 void ADAICharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta)
 {
     if (Delta < 0.f)
     {
+        if (InstigatorActor != this)
+        {
+            SetTargetActor(InstigatorActor);
+        }
+
         if (NewHealth <= 0.f)
         {
             AAIController* AIC = Cast<AAIController>(GetController());
@@ -65,5 +64,14 @@ void ADAICharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponen
         {
             //DisableInput(PC);
         }
+    }
+}
+
+void ADAICharacter::SetTargetActor(AActor* NewTarget)
+{
+    AAIController* AIC = Cast<AAIController>(GetController());
+    if (AIC)
+    {
+        AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
     }
 }

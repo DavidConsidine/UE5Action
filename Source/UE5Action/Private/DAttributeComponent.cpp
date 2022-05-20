@@ -10,7 +10,7 @@ UDAttributeComponent::UDAttributeComponent()
 }
 
 
-bool UDAttributeComponent::ApplyHealthChange(float Delta)
+bool UDAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	float OldHealth = Health;
 
@@ -18,7 +18,7 @@ bool UDAttributeComponent::ApplyHealthChange(float Delta)
 
 	float ActualDelta = Health - OldHealth;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta); // @fixme: Still nullptr for Instigator parameter
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
 
 	return ActualDelta != 0;
 }

@@ -26,6 +26,8 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* owningComp, float NewHealth, float Delta);
 
+	void SetTargetActor(AActor* NewTarget);
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;

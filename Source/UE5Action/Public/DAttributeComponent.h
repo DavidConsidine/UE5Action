@@ -17,7 +17,7 @@ public:
 	UDAttributeComponent();
 
 	UFUNCTION(BlueprintCallable, Category="Attributes")
-	bool ApplyHealthChange(float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool IsAlive() const;

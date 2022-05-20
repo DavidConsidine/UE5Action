@@ -25,7 +25,7 @@ void ADPowerUp_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	if (ensure(AttrComp) && !AttrComp->IsFullHealth())
 	{
 		// Only activate if healed successfully
-		if (AttrComp->ApplyHealthChange(AttrComp->GetHealthMax()))
+		if (AttrComp->ApplyHealthChange(this, AttrComp->GetHealthMax()))
 		{
 			HideAndCooldownPowerUp();
 		}

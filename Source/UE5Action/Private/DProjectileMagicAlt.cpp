@@ -25,6 +25,6 @@ void ADProjectileMagicAlt::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 	UDAttributeComponent* AttrComp = Cast<UDAttributeComponent>(OtherActor->GetComponentByClass(UDAttributeComponent::StaticClass()));
 	if (AttrComp)
 	{
-		AttrComp->ApplyHealthChange(-DamageAmount);
+		AttrComp->ApplyHealthChange(GetInstigator(), -DamageAmount);
 	}
 }
