@@ -239,3 +239,8 @@ void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::TryToJump);
 }
 
+void ADCharacter::HealSelf(float Amount /* = 100 */)
+{
+	AttrComp->ApplyHealthChange(this, Amount);
+}
+

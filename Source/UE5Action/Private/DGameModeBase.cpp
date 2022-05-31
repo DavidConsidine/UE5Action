@@ -23,6 +23,20 @@ void ADGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ADGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
+void ADGameModeBase::KillAll()
+{
+	for (TActorIterator<ADAICharacter> It(GetWorld()); It; ++It)
+	{
+		ADAICharacter* Bot = *It;
+
+		UDAttributeComponent* AttrComp = UDAttributeComponent::GetAttributes(Bot);
+		if (ensure(AttrComp) && AttrComp->IsAlive())
+		{
+			AttrComp->Kill(this);	// @fixme: pass in player? for kill credit
+		}
+	}
+}
+
 void ADGameModeBase::SpawnBotTimerElapsed()
 {
 	int32 NrOfAliveBots = 0;

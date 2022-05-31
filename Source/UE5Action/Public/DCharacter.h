@@ -25,6 +25,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
+
 protected:
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
